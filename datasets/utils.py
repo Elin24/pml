@@ -41,8 +41,7 @@ class NormalSample(object):
 
 
         for i, seq in enumerate(dotseqs):
-            u = torch.amin(seq[:, 2:], dim=1, keepdim=True)
-            dotseqs[i] = torch.cat((seq[:, [1, 0]], u), dim=1)
+            dotseqs[i] = seq[:, [1, 0]]
         
         return images, dotseqs
     

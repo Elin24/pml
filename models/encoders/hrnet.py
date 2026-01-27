@@ -472,7 +472,7 @@ class HRNetFPN(nn.Module):
         hr_config.MODEL.EXTRA = CN(new_allowed=True)
 
         hr_config.defrost()
-        hr_config.merge_from_file(os.path.join(os.path.dirname(__file__) , 'configs', f'{version}.yaml'))
+        hr_config.merge_from_file(os.path.join(os.path.dirname(__file__) , 'hrnet_configs', f'{version}.yaml'))
         hr_config.freeze()
         model = HighResolutionNet(hr_config)
 

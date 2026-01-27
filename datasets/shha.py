@@ -15,25 +15,8 @@ else:
 
 
 class SHHA(data.Dataset):
-    def __init__(self, root_path, mode, move_img_to_memory):
-        self.imgids = []
-        # ------- qnrf_patches --------
-        # imtype = 'jpg'
-        # for imgf in os.listdir(os.path.join(root_path, mode)):
-        #     if imtype in imgf:
-        #         self.imgids.append(imgf.replace(f'.{imtype}', ''))
-        
-        # self.imgpath = os.path.join(root_path, mode, '{}' + f'.{imtype}')
-        # self.dotpath = os.path.join(root_path, mode, '{}_ann_new.npy')
-
-        # ------- QNRF_SE_1536 -------
-        imtype = 'png'
-        for imgf in os.listdir(os.path.join(root_path, mode)):
-            if imtype in imgf:
-                self.imgids.append(imgf.replace(f'.{imtype}', ''))
-        
-        self.imgpath = os.path.join(root_path, mode, '{}' + f'.{imtype}')
-        self.dotpath = os.path.join(root_path, mode, '{}.npy')
+    def __init__(self, root_path, mode):
+        self.collect_samples_from_dir(root_path, mode)
         
         self.mode = mode
         self.normalfunc = NormalSample(
@@ -41,26 +24,36 @@ class SHHA(data.Dataset):
             std=[0.229, 0.224, 0.225],
             train = (mode == 'train')
         )
-    
+
+    def _collect_samples_from_dir(self, root_path, mode):
+        image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif'}
+        self.img_paths = []
+        self.dot_paths = []
+        for imgf in os.listdir(os.path.join(root_path, mode)):
+            if imgf.endswith(tuple(image_extensions)):
+                imname, im_ext = os.path.splitext(imgf)
+                self.img_paths.append(os.path.join(root_path, mode, imgf))
+                self.dot_paths.append(os.path.join(root_path, mode, imname + '.npy'))
+
     def __len__(self):
-        return len(self.imgids)
+        return len(self.img_paths)
 
     def __getitem__(self, index):
-        smpid = self.imgids[index]
-        img, dotseq = self.readSampleFromId(smpid, resize_factor=1)
+        imgpath = self.img_paths[index]
+        dotpath = self.dot_paths[index]
+        img, dotseq = self.readSampleFromId(imgpath, dotpath, resize_factor=1)
         image, dotseq = self.normalfunc(img, dotseq)
         # print(image.shape, len(dotseq))
-        return image, dotseq, smpid
+        return image, dotseq, imgpath
 
 
-    def readSampleFromId(self, smpid, resize_factor=1):
-        imgpath = self.imgpath.format(smpid)
+    def readSampleFromId(self, imgpath, dotpath, resize_factor=1):
         img = Image.open(imgpath).convert('RGB')
         if resize_factor > 1:
             img = img.resize((img.width*resize_factor, img.height*resize_factor), Image.LANCZOS)
         
         img = self.normalfunc.im2tensor(img)
-        dotseq = torch.from_numpy(np.load(self.dotpath.format(smpid)))[:, :2] * resize_factor
+        dotseq = torch.from_numpy(np.load(dotpath))[:, :2] * resize_factor
         
         return img, dotseq
 

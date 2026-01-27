@@ -15,8 +15,14 @@ cp run.sh exp/$T/code
 mkdir exp/$T/train.log
 
 datadir=/home/visal/wlin38/crowd/data/QNRF_PNG_SE_1536/
-sword=/data/wlin38/swords/excalibur2.sif
 
+# Train
 python main.py \
      --data-path $datadir \
      --batch-size 16 --device cuda:1 --tag $T 2>&1 | tee exp/$T/train.log/running.log
+
+# Eval
+# python main.py \
+#      --data-path $datadir \
+#      --eval --resume model_ckpt.pth
+#      --batch-size 1 --device cuda:1 --tag $T 2>&1 | tee exp/$T/train.log/running.log

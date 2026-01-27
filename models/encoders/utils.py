@@ -44,6 +44,15 @@ class UpSample_P2P(nn.Module):
         return x
 
 class UpSample_P2PS(nn.Module):
+    """
+    Progressive 2-to-2 UpSample for feature fusion across multiple scales.
+    
+    Args:
+        incs: List of input channels from different scales (highest resolution first)
+        out_channel_factor: Factor to reduce channels by in each fusion step
+        bn: Whether to use batch normalization
+        post_process: Whether to apply a final 3x3 convolution
+    """
     def __init__(self, incs, out_channel_factor=2, bn=True, post_process=True):
         super().__init__()
 

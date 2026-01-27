@@ -13,7 +13,7 @@ def build_loader(config, mode):
         'shha': SHHA
     }[config.DATASET.lower()]
 
-    data_set = Dataset(data_path, mode, move_img_to_memory=False)
+    data_set = Dataset(data_path, mode)
     # num_tasks = dist.get_world_size()
     # global_rank = dist.get_rank()
     # sampler = DistributedSampler(

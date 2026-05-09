@@ -76,7 +76,7 @@ class PMLoss(nn.modules.loss._Loss):
         for i in range(bs):
             den, seq = dens[i, 0], seqs[i]  # Get density map and point sequence
             H, W = den.shape  # Height and width of density map
-            count = seq[:, -1].sum()  # Number of people in the ground truth
+            count = float(seq.shape[0])  # Number of people in the ground truth
             
             if count < 1:
                 # No people in the image, penalize any predicted density
